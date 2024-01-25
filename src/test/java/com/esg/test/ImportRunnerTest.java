@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -50,7 +49,23 @@ class ImportRunnerTest {
   }
 
   @Test
-  public void testGivenMissingCsvWhenRunImportThenErrorIsLogged() throws Exception {
+  public void testGivenValidCsvWithOneEntryWhenRunImportThenPostIsCalledWithProperArgument() throws Exception {
+    Customer expected = new Customer();
+    expected.setCustomerRef("123");
+    expected.setCustomerName("Jane Doe");
+    expected.setAddressLine1("10 Downing Street");
+    expected.setAddressLine2("");
+    expected.setTown("London");
+    expected.setCounty("Greater London");
+    expected.setCountry("England");
+    expected.setPostcode("SW1A 2AA");
+    ApplicationArguments args = new DefaultApplicationArguments("target/test-classes/test2.csv","--api.url=http://localhost/test");
+    runner.run(args);
+    verify(restTemplate, times(1)).postForEntity(eq("http://localhost/test"), eq(expected), any());
+  }
+  
+  @Test
+  public void testGivenNonExistingCsvWhenRunImportThenErrorIsLogged() throws Exception {
     ApplicationArguments args = new DefaultApplicationArguments("target/test-classes/nosuchfile.csv","--api.url=http://localhost/test");
     ConsoleCaptor console = new ConsoleCaptor();
     
@@ -64,7 +79,7 @@ class ImportRunnerTest {
   }
   
   @Test
-  public void testGivenMissingCsvWhenRunImportThenPostIsNotCalled() throws Exception {
+  public void testGivenNonExistingCsvWhenRunImportThenPostIsNotCalled() throws Exception {
     ApplicationArguments args = new DefaultApplicationArguments("target/test-classes/nosuchfile.csv","--api.url=http://localhost/test");
     runner.run(args);
     verify(restTemplate, times(0)).postForEntity(any(), any(), any());

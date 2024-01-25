@@ -1,7 +1,8 @@
 # ESG Test Task - Import App
 
 Build the project with Maven then run it form inside an IDE or from the command line:
-java -jar target/import-0.0.1-SNAPSHOT.jar {filename} [--api.url={customer.endpoint}]
+
+**java -jar target/import-0.0.1-SNAPSHOT.jar {filename} [--api.url={customer.endpoint}]**
 
 filename can be absolute or relative to the current directory.
 
@@ -18,4 +19,4 @@ The api.url can be also overridden with a launch parameter: --api.url
 
 example:
 
-java -jar target/import-0.0.1-SNAPSHOT.jar test.csv --api.url=http://localhost:8080/customers
+**java -jar target/import-0.0.1-SNAPSHOT.jar test.csv --api.url=http://localhost:8080/customers**
