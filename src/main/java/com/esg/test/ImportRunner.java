@@ -18,6 +18,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class ImportRunner implements ApplicationRunner{
       File file = new File(name);
 
       var urls = args.getOptionValues("api.url");
-      var url = (urls!= null && !urls.isEmpty())?urls.get(0) : apiUrl; 
+      var url = (urls!= null && !urls.isEmpty()) ? urls.get(0) : apiUrl; 
       try {
         log.info("processing {}...", file.getAbsoluteFile());
         var customers = readCsv(new FileInputStream(file));
@@ -76,7 +77,12 @@ public class ImportRunner implements ApplicationRunner{
       try {
         restTemplate.postForEntity(url, customer, Void.class);
       } catch (HttpStatusCodeException ex) {
+        // 404, 409, etc...
         log.error("Unsuccessful POST request: {}", ex.getStatusCode());
+      } catch (ResourceAccessException ex) {
+        // connection error
+        log.error("Cannot access {}", url);
+        return;
       }
     }
     
